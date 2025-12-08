@@ -45,8 +45,10 @@
                         class="hover:text-indigo-600 {{ request()->routeIs('cart.*', 'checkout.*') ? 'text-indigo-600 font-semibold' : '' }}">Keranjang</a>
                     <a href="{{ route('customer.profile.edit') }}"
                         class="hover:text-indigo-600 {{ request()->routeIs('customer.profile.*') ? 'text-indigo-600 font-semibold' : '' }}">Profil</a>
-                    @if (auth()->user()->level === 'admin' || auth()->user()->level === 'seller')
+                    @if (auth()->user()->level === 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600">Admin</a>
+                    @elseif (auth()->user()->level === 'seller')
+                        <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600">Seller</a>
                     @endif
                 @endauth
             </nav>

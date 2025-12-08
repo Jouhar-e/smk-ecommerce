@@ -60,14 +60,18 @@
                 </p>
             </a>
 
-            <a href="{{ route('admin.users.index') }}"
-                class="bg-white rounded-2xl border border-slate-200 p-4 hover:border-indigo-300 hover:shadow-md transition">
-                <div class="text-xs text-slate-500 mb-1">Pengguna</div>
-                <div class="font-semibold mb-1">User</div>
-                <p class="text-xs text-slate-500">
-                    Atur level dan status akun pengguna.
-                </p>
-            </a>
+            @if (auth()->user()->level === 'admin')
+                <a href="{{ route('admin.users.index') }}"
+                    class="bg-white rounded-2xl border border-slate-200 p-4 hover:border-indigo-300 hover:shadow-md transition">
+                    <div class="text-xs text-slate-500 mb-1">Pengguna</div>
+                    <div class="font-semibold mb-1">User</div>
+                    <p class="text-xs text-slate-500">
+                        Atur level dan status akun pengguna.
+                    </p>
+                </a>
+            @endif
+
+
 
             <a href="{{ route('admin.profile.edit') }}"
                 class="bg-white rounded-2xl border border-slate-200 p-4 hover:border-indigo-300 hover:shadow-md transition">

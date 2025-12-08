@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -43,16 +44,22 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $request->validate([
-            'level' => 'required|in:admin,seller,customer',
-            'status' => 'required|boolean',
+        $validated = $request->validate([
+            'level'    => ['required', 'in:admin,seller,customer'],
+            'status'   => ['required', 'boolean'],
+            // password tidak wajib, tapi kalau diisi harus valid dan confirmed
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $user->update([
-            'level' => $request->level,
-            'status' => $request->status,
-        ]);
+        $user->level  = $validated['level'];
+        $user->status = $validated['status'];
 
-        return redirect()->route('admin.users.index')->with('success', 'User diperbarui.');
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        return redirect()->route('admin.users.index')->with('success', 'Data user berhasil diperbarui.');
     }
 }

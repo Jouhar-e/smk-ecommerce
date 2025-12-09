@@ -19,13 +19,13 @@
 
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    {{-- HEADER / NAVBAR --}}
     <header class="border-b bg-white/80 backdrop-blur sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+            {{-- LOGO + NAMA TOKO --}}
             <div class="flex items-center gap-3">
-                @if (!empty($profile?->logo_path))
+                @if (!empty($profile?->logo_path) && file_exists(storage_path('app/public/' . $profile->logo_path)))
                     <img src="{{ asset('storage/' . $profile->logo_path) }}"
-                        alt="{{ $profile->store_name ?? 'Logo Toko' }}" class="h-10 w-auto object-contain">
+                        alt="{{ $profile->store_name ?? 'Logo Toko' }}" class="h-12 w-auto object-contain">
                 @else
                     <div
                         class="h-10 w-10 rounded-lg bg-indigo-500 flex items-center justify-center text-white font-bold">
@@ -44,25 +44,36 @@
                 </div>
             </div>
 
+            {{-- NAV DESKTOP --}}
             <nav class="hidden md:flex items-center gap-6 text-sm">
                 <a href="{{ route('home') }}"
-                    class="hover:text-indigo-600 {{ request()->routeIs('home') ? 'text-indigo-600 font-semibold' : '' }}">Beranda</a>
+                    class="hover:text-indigo-600 {{ request()->routeIs('home') ? 'text-indigo-600 font-semibold' : '' }}">
+                    Beranda
+                </a>
                 @auth
                     <a href="{{ route('orders.index') }}"
-                        class="hover:text-indigo-600 {{ request()->routeIs('orders.*') ? 'text-indigo-600 font-semibold' : '' }}">Pesanan</a>
+                        class="hover:text-indigo-600 {{ request()->routeIs('orders.*') ? 'text-indigo-600 font-semibold' : '' }}">
+                        Pesanan
+                    </a>
                     <a href="{{ route('cart.index') }}"
-                        class="hover:text-indigo-600 {{ request()->routeIs('cart.*', 'checkout.*') ? 'text-indigo-600 font-semibold' : '' }}">Keranjang</a>
+                        class="hover:text-indigo-600 {{ request()->routeIs('cart.*', 'checkout.*') ? 'text-indigo-600 font-semibold' : '' }}">
+                        Keranjang
+                    </a>
                     <a href="{{ route('customer.profile.edit') }}"
-                        class="hover:text-indigo-600 {{ request()->routeIs('customer.profile.*') ? 'text-indigo-600 font-semibold' : '' }}">Profil</a>
-                    @if (auth()->user()->level === 'admin')
-                        <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600">Admin</a>
-                    @elseif (auth()->user()->level === 'seller')
-                        <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600">Seller</a>
+                        class="hover:text-indigo-600 {{ request()->routeIs('customer.profile.*') ? 'text-indigo-600 font-semibold' : '' }}">
+                        Profil
+                    </a>
+                    @if (auth()->user()->level === 'admin' || auth()->user()->level === 'seller')
+                        <a href="{{ route('admin.dashboard') }}"
+                            class="hover:text-indigo-600 {{ str_starts_with(request()->route()->getName(), 'admin.') ? 'text-indigo-600 font-semibold' : '' }}">
+                            Admin
+                        </a>
                     @endif
                 @endauth
             </nav>
 
-            <div class="flex items-center gap-3">
+            {{-- AKSI KANAN (DESKTOP) --}}
+            <div class="hidden md:flex items-center gap-3">
                 @guest
                     <a href="{{ route('login') }}" class="text-sm text-slate-600 hover:text-indigo-600">Masuk</a>
                     <a href="{{ route('register') }}"
@@ -80,6 +91,56 @@
                             Keluar
                         </button>
                     </form>
+                @endguest
+            </div>
+
+            {{-- BUTTON HAMBURGER (MOBILE) --}}
+            <button id="mobile-menu-toggle"
+                class="md:hidden inline-flex items-center justify-center p-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100">
+                <span class="sr-only">Toggle menu</span>
+                ☰
+            </button>
+        </div>
+
+        {{-- NAVBAR MOBILE (DROPDOWN) --}}
+        <div id="mobile-menu" class="md:hidden border-t bg-white hidden">
+            <div class="max-w-6xl mx-auto px-4 py-3 space-y-2 text-sm">
+                <a href="{{ route('home') }}"
+                    class="block py-1 {{ request()->routeIs('home') ? 'text-indigo-600 font-semibold' : 'text-slate-700' }}">
+                    Beranda
+                </a>
+
+                @auth
+                    <a href="{{ route('orders.index') }}"
+                        class="block py-1 {{ request()->routeIs('orders.*') ? 'text-indigo-600 font-semibold' : 'text-slate-700' }}">
+                        Pesanan
+                    </a>
+                    <a href="{{ route('cart.index') }}"
+                        class="block py-1 {{ request()->routeIs('cart.*', 'checkout.*') ? 'text-indigo-600 font-semibold' : 'text-slate-700' }}">
+                        Keranjang
+                    </a>
+                    <a href="{{ route('customer.profile.edit') }}"
+                        class="block py-1 {{ request()->routeIs('customer.profile.*') ? 'text-indigo-600 font-semibold' : 'text-slate-700' }}">
+                        Profil
+                    </a>
+                    @if (auth()->user()->level === 'admin' || auth()->user()->level === 'seller')
+                        <a href="{{ route('admin.dashboard') }}"
+                            class="block py-1 {{ str_starts_with(request()->route()->getName(), 'admin.') ? 'text-indigo-600 font-semibold' : 'text-slate-700' }}">
+                            Admin
+                        </a>
+                    @endif
+
+                    <form action="{{ route('logout') }}" method="POST" class="pt-2">
+                        @csrf
+                        <button class="w-full text-left py-1 text-slate-700">
+                            Keluar
+                        </button>
+                    </form>
+                @endauth
+
+                @guest
+                    <a href="{{ route('login') }}" class="block py-1 text-slate-700">Masuk</a>
+                    <a href="{{ route('register') }}" class="block py-1 text-slate-700">Daftar</a>
                 @endguest
             </div>
         </div>
@@ -143,6 +204,20 @@
             &copy; {{ date('Y') }} {{ $profile->store_name ?? 'Toko SMK' }}. All rights reserved.
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('mobile-menu-toggle');
+            const menu = document.getElementById('mobile-menu');
+
+            if (btn && menu) {
+                btn.addEventListener('click', function() {
+                    menu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+
 
 </body>
 

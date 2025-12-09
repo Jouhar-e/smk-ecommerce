@@ -6,7 +6,16 @@
     <title>{{ $title ?? ($profile->store_name ?? config('app.name')) }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- Favicon dinamis dari logo toko --}}
+    @if (!empty($profile?->logo_path) && file_exists(storage_path('app/public/' . $profile->logo_path)))
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $profile->logo_path) }}">
+    @else
+        {{-- fallback kalau logo belum ada --}}
+        <link rel="icon" type="image/png" href="{{ asset('default-favicon.png') }}">
+    @endif
 </head>
+
 
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
@@ -15,8 +24,8 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <div class="flex items-center gap-3">
                 @if (!empty($profile?->logo_path))
-                    <img src="{{ asset('storage/' . $profile->logo_path) }}" alt="Logo"
-                        class="h-10 w-10 rounded-lg object-cover">
+                    <img src="{{ asset('storage/' . $profile->logo_path) }}"
+                        alt="{{ $profile->store_name ?? 'Logo Toko' }}" class="h-10 w-auto object-contain">
                 @else
                     <div
                         class="h-10 w-10 rounded-lg bg-indigo-500 flex items-center justify-center text-white font-bold">

@@ -83,34 +83,48 @@
             </a>
         </div>
 
-        {{-- Pesanan terbaru (boleh tetap ada) --}}
-        <div class="bg-white rounded-2xl border border-slate-200 p-4">
+        {{-- Pesanan terbaru --}}
+        <div class="bg-white rounded-2xl border border-slate-200 p-3 sm:p-4">
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-sm font-semibold">Pesanan Terbaru</h2>
             </div>
-            <div class="overflow-x-auto text-sm">
+
+            <div class="overflow-x-auto -mx-2 sm:mx-0 text-xs sm:text-sm">
                 <table class="min-w-full">
                     <thead>
-                        <tr class="border-b text-xs text-slate-500">
-                            <th class="py-2 text-left">Tanggal</th>
-                            <th class="py-2 text-left">Customer</th>
-                            <th class="py-2 text-left">Total</th>
-                            <th class="py-2 text-left">Status</th>
-                            <th class="py-2 text-left">Pembayaran</th>
+                        <tr class="border-b text-[11px] sm:text-xs text-slate-500">
+                            <th class="py-2 px-2 text-left">Tanggal</th>
+                            <th class="py-2 px-2 text-left">Customer</th>
+                            <th class="py-2 px-2 text-left">Total</th>
+                            <th class="py-2 px-2 text-left">Status</th>
+                            <th class="py-2 px-2 text-left">Pembayaran</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($recentOrders as $order)
                             <tr class="border-b last:border-b-0">
-                                <td class="py-2">{{ $order->order_date->format('d/m/Y H:i') }}</td>
-                                <td class="py-2">{{ $order->customer_name }}</td>
-                                <td class="py-2">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
-                                <td class="py-2 text-xs uppercase">{{ $order->status }}</td>
-                                <td class="py-2 text-xs uppercase">{{ $order->payment_status }}</td>
+                                <td class="py-2 px-2 align-top whitespace-nowrap">
+                                    {{ $order->order_date->format('d/m/Y H:i') }}
+                                </td>
+                                <td class="py-2 px-2 align-top">
+                                    <div class="font-medium">{{ $order->customer_name }}</div>
+                                    <div class="text-[11px] text-slate-500 hidden sm:block">
+                                        {{ Str::limit($order->customer_address, 40) }}
+                                    </div>
+                                </td>
+                                <td class="py-2 px-2 align-top whitespace-nowrap">
+                                    Rp {{ number_format($order->total, 0, ',', '.') }}
+                                </td>
+                                <td class="py-2 px-2 align-top text-[11px] uppercase">
+                                    {{ $order->status }}
+                                </td>
+                                <td class="py-2 px-2 align-top text-[11px] uppercase">
+                                    {{ $order->payment_status }}
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="py-4 text-center text-slate-500">
+                                <td colspan="5" class="py-4 px-2 text-center text-slate-500">
                                     Belum ada pesanan.
                                 </td>
                             </tr>
@@ -119,5 +133,6 @@
                 </table>
             </div>
         </div>
+
     </div>
 @endsection
